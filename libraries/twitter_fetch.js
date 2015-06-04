@@ -15,7 +15,8 @@ exports.fetch = function(input, callback) {
       bearer_token: input.bearer_token
     });
 
-    var params = {q: input.searchTerm, count: input.fetchCount};
+    var params = {q: input.searchTerm, count: input.fetchCount, since_id: input.latestID};
+    console.log(params);
     client.get('/search/tweets', params, function(error, body, response){
       if (!error) {
       var returnArr = [];
@@ -23,7 +24,10 @@ exports.fetch = function(input, callback) {
       var valuesArr = [];
       var d = new Date();
       var n = d.toISOString();
-      var latestIDValue = 0;
+      var latestIDValue = 0
+      if (input.latestID > 0){
+        var latestIDValue = input.latestID;
+      }
       for (var i in body.statuses) {
 
             var postHasVideo = 'false';
@@ -33,7 +37,7 @@ exports.fetch = function(input, callback) {
             var postVideoPreviewURL = '';
             var postVideoURL = '';
 
-            if (body.statuses[i].id > input.since_id){
+            if (body.statuses[i].id > input.latestID){
               since_id_return = body.statuses[i].id;
             }
 
