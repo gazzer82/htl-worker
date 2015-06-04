@@ -14,6 +14,7 @@ var app = express();
 //Social Media Frameworks
 
 var Twitter = require('./libraries/twitter_fetch.js')
+var Instagram = require('./libraries/instagram_fetch.js')
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -48,7 +49,16 @@ app.use('/fetch', function(req, res, next) {
             });
         break;
     case 'instagram':
-
+            var instagramVals = {
+              //bearer_token: req.body.bearer_token,
+              searchTerm: req.body.searchTerm,
+              fetchCount: req.body.fetchCount,
+              latestID: req.body.latestID,
+              clientID: req.body.clientID
+            }
+            Instagram.fetch(instagramVals, function(returnValue) {
+              res.json(returnValue);
+            });
         break;
     case 'vine':
     
