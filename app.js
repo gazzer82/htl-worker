@@ -41,7 +41,7 @@ app.use('/fetch', function(req, res, next) {
               bearer_token: req.body.bearer_token,
               searchTerm: req.body.searchTerm,
               fetchCount: req.body.fetchCount,
-              since_id: req.body.since_id
+              latestID: req.body.latestID
             }
             Twitter.fetch(twitterVals, function(returnValue) {
               res.json(returnValue);
