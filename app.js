@@ -15,6 +15,7 @@ var app = express();
 
 var Twitter = require('./libraries/twitter_fetch.js')
 var Instagram = require('./libraries/instagram_fetch.js')
+var Vine = require('./libraries/vine_fetch.js')
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -44,8 +45,14 @@ app.use('/fetch', function(req, res, next) {
               fetchCount: req.body.fetchCount,
               latestID: req.body.latestID
             }
-            Twitter.fetch(twitterVals, function(returnValue) {
-              res.json(returnValue);
+            Twitter.fetch(twitterVals, function(err, returnValue) {
+              if(err){
+                console.log('We have an errror');
+                res.json(err);
+              } else {
+                console.log('All went fine');
+                res.json(returnValue);
+              }
             });
         break;
     case 'instagram':
@@ -56,12 +63,26 @@ app.use('/fetch', function(req, res, next) {
               latestID: req.body.latestID,
               clientID: req.body.clientID
             }
-            Instagram.fetch(instagramVals, function(returnValue) {
-              res.json(returnValue);
+            Instagram.fetch(instagramVals, function(err, returnValue) {
+              if(err){
+                res.json(err);
+              } else {
+                res.json(returnValue);
+              }
             });
         break;
     case 'vine':
-    
+              var vineVals = {
+              searchTerm: req.body.searchTerm,
+              latestID: req.body.latestID
+            }
+            Vine.fetch(vineVals, function(err, returnValue) {
+              if(err){
+                res.json(err);
+              } else {
+                res.json(returnValue);
+              }
+            });
         break;
     default:
         res.send("No know social network of type " + req.body.type);

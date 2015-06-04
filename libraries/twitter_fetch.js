@@ -6,6 +6,8 @@ var Twitter = require('twitter');
 //var Twitter = require('../../node-modules/node-twitter/lib/twitter.js');
 var OAuth2 = require('OAuth').OAuth2;
 var https = require('https');
+var util = require('util');
+
 
 exports.fetch = function(input, callback) {
     var posts = []
@@ -19,6 +21,7 @@ exports.fetch = function(input, callback) {
     console.log(params);
     client.get('/search/tweets', params, function(error, body, response){
       if (!error) {
+      //var error = undefined;
       var returnArr = [];
       var postsArr = [];
       var valuesArr = [];
@@ -45,7 +48,6 @@ exports.fetch = function(input, callback) {
               latestIDValue = body.statuses[i].id;
             }
 
-            console.log(body.statuses[i].entities.media);
             if (body.statuses[i].entities.media) {
               console.log('Media');
               if (body.statuses[i].entities.media[0].type == 'photo') {
@@ -97,13 +99,13 @@ exports.fetch = function(input, callback) {
        }
        values = {}
        values.latestID = latestIDValue
-       //valuesArr.push(values);
        returnArr.push(postsArr);
        returnArr.push(values);
-       callback(returnArr);
+       //callback(error, returnArr);
       } else {
-        //console.log(error);
-        callback(error);
+        console.log(util.inspect(error, false, null));
+        //var error_return = error;
       }
+      callback(error, returnArr);
     });
 }
