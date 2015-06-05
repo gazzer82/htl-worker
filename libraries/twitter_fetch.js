@@ -18,7 +18,6 @@ exports.fetch = function(input, callback) {
     });
 
     var params = {q: input.searchTerm, count: input.fetchCount, since_id: input.latestID};
-    console.log(params);
     client.get('/search/tweets', params, function(error, body, response){
       if (!error) {
       //var error = undefined;
@@ -49,7 +48,6 @@ exports.fetch = function(input, callback) {
             }
 
             if (body.statuses[i].entities.media) {
-              console.log('Media');
               if (body.statuses[i].entities.media[0].type == 'photo') {
                   postHasImage = 'true';
                   postImagePreviewURL = body.statuses[i].entities.media[0].media_url + ':small';
@@ -71,7 +69,6 @@ exports.fetch = function(input, callback) {
 
                 }
               } else {
-                console.log('No Media');
               }
 
             postsArr.push({
@@ -102,9 +99,6 @@ exports.fetch = function(input, callback) {
        returnArr.push(postsArr);
        returnArr.push(values);
        //callback(error, returnArr);
-      } else {
-        console.log(util.inspect(error, false, null));
-        //var error_return = error;
       }
       callback(error, returnArr);
     });

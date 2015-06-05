@@ -5,6 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var router = express.Router();
+var util = require('util');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -65,8 +66,10 @@ app.use('/fetch', function(req, res, next) {
             }
             Instagram.fetch(instagramVals, function(err, returnValue) {
               if(err){
+                console.log('We have an errror');
                 res.json(err);
               } else {
+                console.log('All went fine');
                 res.json(returnValue);
               }
             });
@@ -78,8 +81,10 @@ app.use('/fetch', function(req, res, next) {
             }
             Vine.fetch(vineVals, function(err, returnValue) {
               if(err){
+                console.log('We have an error - ' + util.inspect(err, false, null));
                 res.json(err);
               } else {
+                console.log('All went fine');
                 res.json(returnValue);
               }
             });

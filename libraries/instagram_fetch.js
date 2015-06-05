@@ -12,6 +12,7 @@ exports.fetch = function (input, callback)  {
     var min_tag_id = 0;
     var i3 = 0;
     var searchTerm = "";
+    var error;
     if (input.searchTerm){
       console.log(input.searchTerm);
       var searchTermArray = input.searchTerm.split(" ");
@@ -44,11 +45,12 @@ exports.fetch = function (input, callback)  {
 
         if (err) {
           //return exits.error(err);
-          callback(err);
-        }
-        if (response.statusCode > 299 || response.statusCode < 200) {
+          //callback(err);
+          error = err;
+        } else if (response.statusCode > 299 || response.statusCode < 200) {
           //return exits.error(response.statusCode);
-          callback('Error: ' + response.statusCode);
+          //callback('Error: ' + response.statusCode);
+          error = response;
         } else {
         //var postsArr = [];
         var d = new Date();
@@ -97,7 +99,7 @@ exports.fetch = function (input, callback)  {
         var returnArr = [];
         returnArr.push(postsArr);
         returnArr.push(values);
-        callback(returnArr);
-    } 
+    }
+    callback(error, returnArr);
   });
 }

@@ -4,6 +4,7 @@
 //Import request framework
 
 var request = require('request');
+var util = require('util');
 
 
 exports.fetch = function (input, callback)  {
@@ -11,8 +12,8 @@ exports.fetch = function (input, callback)  {
     var postsArr = [];
     var min_tag_id = 0;
     var searchTerm = "";
+    var error;
     if (input.searchTerm){
-      console.log(input.searchTerm);
       var searchTermArray = input.searchTerm.split(" ");
         for (i=0; i < searchTermArray.length; i++){
           searchTerm = searchTerm + searchTermArray[i];
@@ -20,76 +21,71 @@ exports.fetch = function (input, callback)  {
     }
 
       var tempURL = 'https://api.vineapp.com/timelines/tags/' + searchTerm
-
-      console.log(tempURL);
-
         request.get({
-
-        url: tempURL,
-
-        json: true,
-
+          url: tempURL,
+          json: true,
       },
 
       function(err, response, body) {
-
+        var latestIDValue = 0;
+        if (input.latestID > 0){
+          latestIDValue = input.latestID;
+        }
         if (err) {
           //return exits.error(err);
-          callback(err);
+          error = err;
         }
         if (response.statusCode > 299 || response.statusCode < 200) {
           //return exits.error(response.statusCode);
-          callback('Error: ' + response.statusCode);
+          error = response;
         } else {
         //var postsArr = [];
         var d = new Date();
         var n = d.toISOString();
-          callback(response);
-          /*if (body.pagination.min_tag_id > input.latestID || !input.latestID ){
-            for (var i in body.data) {
+          //callback(response);
+          if (body.data.records){
+              for (var i in body.data.records) {
+                if (body.data.records[i].postId > input.latestID || !input.latestID){
+                  if (body.data.records[i].postId > latestIDValue){
+                    latestIDValue = body.data.records[i].postId;
+                  }
+                  var postHasVideo = true;
+                  var postHasImage = false;
+                  var postImagePreviewURL = '';
+                  var postImageURL = '';
+                  var postVideoPreviewURL = '';
+                  var postVideoURL = '';
+                  postsArr.push({
+                    postID: body.data.records[i].postId,
+                    postText: body.data.records[i].description,
+                    postStatus: 'new',
+                    postDate: body.data.records[i].created,
+                    postScheduleDate: '',
+                    postUserImageURL: body.data.records[i].avatarUrl,
+                    postUserRealName: body.data.records[i].username,
+                    postUserName: body.data.records[i].username,
+                    postUpdateUser: '',
+                    postType: 'instagram',
 
-              var postHasVideo = false;
-              var postHasImage = false;
-              var postImagePreviewURL = '';
-              var postImageURL = '';
-              var postVideoPreviewURL = '';
-              var postVideoURL = '';
-
-
-              postsArr.push({
-                postID: body.data[i].id,
-                postText: body.data[i].caption.text,
-                postStatus: 'new',
-                postDate: body.data[i].created_time,
-                postScheduleDate: '',
-                postUserImageURL: body.data[i].user.profile_picture,
-                postUserRealName: body.data[i].user.full_name,
-                postUserName: body.data[i].user.username,
-                postUpdateUser: '',
-                postType: 'instagram',
-
-                postStatusDate: n,
-                    
-                postHasVideo: postHasVideo,
-                postHasImage: true,
-                postImagePreviewURL: body.data[i].images.low_resolution.url,
-                postImageURL: body.data[i].images.standard_resolution.url,
-                postVideoPreviewURL: postVideoPreviewURL,
-                postVideoURL: postVideoURL
-
-              });
+                    postStatusDate: n,
+                        
+                    //postHasVideo: postHasVideo,
+                    //postHasImage: true,
+                    postImagePreviewURL: body.data.records[i].thumbnailUrl,
+                    postImageURL: body.data.records[i].thumbnailUrl,
+                    postVideoPreviewURL: body.data.records[i].videoLowURL,
+                    postVideoURL: body.data.records[i].videoUrl
+                  });
+                }
             }
+          } else {
+            error = 'No Records Found';
           }
         var values = {}
-        if (postsArr.length > 1){
-          values.latestID = body.pagination.min_tag_id
-        } else {
-          values.latestID = input.latestID
-        }
         var returnArr = [];
         returnArr.push(postsArr);
         returnArr.push(values);
-        callback(returnArr);*/
-    } 
+    }
+    callback(error, returnArr);
   });
 }
